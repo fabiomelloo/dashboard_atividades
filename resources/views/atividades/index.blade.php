@@ -1,59 +1,104 @@
-<!DOCTYPE html>
-<html lang="en">    
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Dashboard de Atividades</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZmK9OlkOP+XkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head> 
-<body>
-     @extends('layout.app') 
-        @section('content')
-        <h1 class="mb-4">Dashboard de Atividades</h1>
-        <a href="{{ route('atividades.create') }}" class="btn btn-primary mb-3">Adicionar Atividade</a>
-        <table class="table table-striped"> 
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Título</th>
-                    <th>Descrição</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($atividades as $atividade)
-                <tr>
-                    <td>{{ $atividade->id }}</td>
-                    <td>{{ $atividade->titulo }}</td>
-                    <td>{{ $atividade->descricao }}</td>
-                    <td>{{ $atividade->status }}</td>
-                    <td>
-                        <a href="{{ route('atividades.editar', $atividade->id) }}" class="btn btn-sm btn-warning">Editar</a>
-                        @if($atividade->status == 'Pendente')
-                            <a href="{{ route('atividades.concluir', $atividade->id) }}" class="btn btn-sm btn-success">Concluir</a>
-                        @else
-                            <a href="{{ route('atividades.reabrir', $atividade->id) }}" class="btn btn-sm btn-secondary">Reabrir</a>
-                        @endif
-                        <form action="{{ route('atividades.destroy', $atividade->id) }}" method="POST" style="display:inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja deletar esta atividade?')">Deletar</button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-        @endsection 
+@extends('layout.app')
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
-    <script src="{{ asset('js/scripts.js') }}"></script>    
-</body>
-</html>
+@section('conteudo')
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Minhas Ocorrências</h1>
+        <a href="{{ route('atividades.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nova Ocorrência
+        </a>
+    </div>
 
-    
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Título</th>
+                            <th>Data</th>
+                            <th>Prioridade</th>
+                            <th>Status</th>
+                            <th>Responsável</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($atividades as $atividade)
+                            <tr>
+                                <td class="align-middle">
+                                    <h6 class="mb-0">{{ $atividade->titulo }}</h6>
+                                    <small class="text-muted">{{ Str::limit($atividade->descricao, 50) }}</small>
+                                </td>
+                                <td class="align-middle text-nowrap">
+                                    {{ \Carbon\Carbon::parse($atividade->data_atividade)->format('d/m/Y') }}
+                                </td>
+                                <td class="align-middle">
+                                    @php
+                                        $prioridadeClass = match($atividade->prioridade) {
+                                            '1', 1 => 'bg-danger',
+                                            '2', 2 => 'bg-warning text-dark',
+                                            '3', 3 => 'bg-info text-dark',
+                                            default => 'bg-secondary'
+                                        };
+                                        $prioridadeLabel = match($atividade->prioridade) {
+                                            '1', 1 => 'Alta',
+                                            '2', 2 => 'Média',
+                                            '3', 3 => 'Baixa',
+                                            default => $atividade->prioridade
+                                        };
+                                    @endphp
+                                    <span class="badge {{ $prioridadeClass }}">{{ $prioridadeLabel }}</span>
+                                </td>
+                                <td class="align-middle">
+                                    @php
+                                        $statusClass = match($atividade->status) {
+                                            'Pendente' => 'bg-warning text-dark',
+                                            'Em Andamento' => 'bg-primary',
+                                            'Concluída' => 'bg-success',
+                                            'Cancelada' => 'bg-danger',
+                                            default => 'bg-secondary'
+                                        };
+                                    @endphp
+                                    <span class="badge {{ $statusClass }}">{{ $atividade->status }}</span>
+                                </td>
+                                <td class="align-middle">{{ $atividade->responsavel ?? 'N/A' }}</td>
+                                <td class="text-end align-middle">
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ route('atividades.show', $atividade) }}" class="btn btn-outline-info" title="Visualizar">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('atividades.edit', $atividade) }}" class="btn btn-outline-primary" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('atividades.destroy', $atividade) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-outline-danger" title="Excluir" onclick="return confirm('Tem certeza que deseja excluir esta atividade?')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">Nenhuma atividade encontrada.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        {{ $atividades->links() }}
+    </div>
+@endsection

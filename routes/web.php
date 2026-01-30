@@ -18,6 +18,6 @@ Route::delete('/atividades/{atividade}', [AtividadeController::class, 'destroy']
 Route::get('/atividades/{atividade}/editar', [AtividadeController::class, 'edit'])->name('atividades.editar');
 Route::put('/atividades/{atividade}', [AtividadeController::class, 'update'])->name('atividades.atualizar');
 Route::get('/atividades/criar', [AtividadeController::class, 'create'])->name('atividades.criar');
-Route::post('/atividades', [AtividadeController::class, 'store'])->name('atividades.salvar');
+Route::post('/atividades', [AtividadeController::class, 'store'])->name('atividades.store');
 Route::get('/atividades', [AtividadeController::class, 'index'])->name('atividades.index');
-Route::get('/atividades/{atividade}', [AtividadeController::class, 'show'])->name('atividades.mostrar');
+Route::get('/atividades/{atividade}', [AtividadeController::class, 'show'])->name('atividades.show');

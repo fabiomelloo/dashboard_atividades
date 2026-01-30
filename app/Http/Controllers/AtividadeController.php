@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Atividades;
+use App\Models\Atividade;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -13,8 +13,8 @@ class AtividadeController extends Controller
      */
     public function index()
     {
-        $atividades = Atividades::all();
-        $ativaidade = Atividades::paginate(10);
+        $atividades = Atividade::paginate(10); 
+        
         return view('atividades.index', compact('atividades'));
     }
 
@@ -34,9 +34,15 @@ class AtividadeController extends Controller
         $data = $request->validate([
             'titulo' => 'required|string|max:255',
             'descricao' => 'nullable|string',
+            'data_atividade' => 'required|date',
+            'data_conclusao' => 'nullable|date',
+            'status' => 'required|string',
+            'prioridade' => 'required|string',
+            'responsavel' => 'nullable|string|max:255',
+            'solicitante' => 'nullable|string|max:255',
         ]);
 
-        Atividades::create($data);
+        Atividade::create($data);
 
         return redirect()->route('atividades.index')->with('success', 'Atividade criada.');
     }
@@ -44,15 +50,16 @@ class AtividadeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Atividades $atividade)
+    public function show(Atividade $atividade)
     {
+
         return view('atividades.show', compact('atividade'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Atividades $atividade)
+    public function edit(Atividade $atividade)
     {
         return view('atividades.edit', compact('atividade'));
     }
@@ -60,7 +67,7 @@ class AtividadeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Atividades $atividade)
+    public function update(Request $request, Atividade $atividade)
     {
         $data = $request->validate([
             'titulo' => 'required|string|max:255',
@@ -81,7 +88,7 @@ class AtividadeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Atividades $atividade)
+    public function destroy(Atividade $atividade)
     {
         $atividade->delete();
         return redirect()->route('atividades.index')->with('success', 'Atividade removida.');
