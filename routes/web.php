@@ -19,3 +19,4 @@ Route::get('/atividades/criar', [AtividadeController::class, 'create'])->name('a
 Route::post('/atividades', [AtividadeController::class, 'store'])->name('atividades.store');
 Route::get('/atividades', [AtividadeController::class, 'index'])->name('atividades.index');
 Route::get('/atividades/{atividade}', [AtividadeController::class, 'show'])->name('atividades.show');
+Route::post('/atividades/importar', [AtividadeController::class, 'import'])->name('atividades.import');

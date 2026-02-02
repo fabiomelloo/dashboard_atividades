@@ -165,6 +165,9 @@
                         <a href="{{ route('atividades.index') }}" class="btn btn-outline-secondary text-start px-3 py-2">
                             <i class="fas fa-list me-2"></i> Listar Todas as Ocorrências
                         </a>
+                        <button type="button" class="btn btn-outline-success text-start px-3 py-2" data-bs-toggle="modal" data-bs-target="#importModal">
+                            <i class="fas fa-file-excel me-2"></i> Importar do Excel
+                        </button>
                     </div>
                 </div>
             </div>
@@ -178,4 +181,68 @@
         </div>
     </div>
 </div>
+
+<!-- Import Modal -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="{{ route('atividades.import') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importModalLabel">Importar Atividades</h5>
+                    <button type="button" class="btn-close" data-bs-close="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Selecione uma planilha Excel (.xlsx, .xls) ou CSV para importar as demandas.</p>
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Arquivo de Planilha</label>
+                        <input class="form-control" type="file" id="file" name="file" required>
+                    </div>
+                    <div class="alert alert-info">
+                        <small>
+                            <i class="fas fa-info-circle"></i> Headers esperados: STATUS, PRIORIDADE, DATA DE INÍCIO, PRAZO, SOLICITANTE, TIPO DA TAREFA, DESCRIÇÃO, Horário, DATA DA CONCLUSÃO, CONCLUÍDA.
+                        </small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-close="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Importar Agora</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('statusChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pendentes', 'Em Andamento', 'Concluídas'],
+                datasets: [{
+                    data: [
+                        {{ $stats['pendentes'] }}, 
+                        {{ $stats['em_andamento'] }}, 
+                        {{ $stats['concluidas'] }}
+                    ],
+                    backgroundColor: ['#f6c23e', '#4e73df', '#1cc88a'],
+                    hoverBackgroundColor: ['#dda20a', '#224abe', '#17a673'],
+                    hoverBorderColor: "rgba(234, 236, 244, 1)",
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                cutout: '70%',
+            }
+        });
+    });
+</script>
 @endsection

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Atividade;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\AtividadesImport;
 
 class AtividadeController extends Controller
 {
@@ -111,4 +113,15 @@ class AtividadeController extends Controller
 
         return view('home', compact('stats', 'recentes'));
     }
+
+     public function import(Request $request)
+     {
+         $request->validate([
+             'file' => 'required|mimes:xlsx,xls,csv'
+         ]);
+
+         Excel::import(new AtividadesImport, $request->file('file'));
+
+         return redirect()->route('atividades.index')->with('success', 'Atividades importadas com sucesso.');
+     }
 }
