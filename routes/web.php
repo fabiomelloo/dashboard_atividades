@@ -3,9 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AtividadeController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [AtividadeController::class, 'home'])->name('home');
 
 
 Route::resource('atividades', AtividadeController::class);

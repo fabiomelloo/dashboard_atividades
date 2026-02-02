@@ -4,7 +4,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Minhas Ocorrências</h1>
         <a href="{{ route('atividades.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Nova Ocorrência
+            <i class="fas fa-plus"></i> Nova Ocorrência 
         </a>
     </div>
 

@@ -93,4 +93,22 @@ class AtividadeController extends Controller
         $atividade->delete();
         return redirect()->route('atividades.index')->with('success', 'Atividade removida.');
     }
-};
+
+    /**
+     * Display a dashboard as the home page.
+     */
+    public function home()
+    {
+        $stats = [
+            'total' => Atividade::count(),
+            'pendentes' => Atividade::where('status', 'Pendente')->count(),
+            'em_andamento' => Atividade::where('status', 'Em Andamento')->count(),
+            'concluidas' => Atividade::where('status', 'Concluída')->count(),
+            'alta_prioridade' => Atividade::where('prioridade', '1')->orWhere('prioridade', 1)->count(),
+        ];
+
+        $recentes = Atividade::latest()->take(5)->get();
+
+        return view('home', compact('stats', 'recentes'));
+    }
+}
